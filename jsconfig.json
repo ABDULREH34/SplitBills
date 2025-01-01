@@ -2,11 +2,14 @@
   "compilerOptions": {
     "baseUrl": ".", 
     "paths": {
-      "@/*": ["src/*"]
+      "@services/*": ["src/services/*"],
+      "@models/*": ["src/services/models/*"],
+      "@app/*": ["src/app/*"],
+      "/*":["./node_modules/*"]
     }
   },
   "include": [
     "src/**/*",
-    "app/**/*"
+    "src/app/**/*"
   ]
 }
