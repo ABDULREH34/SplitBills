@@ -6,7 +6,7 @@ const DriverDetails = () => {
     <div>
         <div className='flex items-center justify-between'>
                     <div className='flex items-center justify-start gap-3'>
-                        <img className='h-10 w-10 rounded-full object-cover' src="people.jpg" alt='' />
+                        <img className='h-10 w-10 rounded-full object-cover' src="/people.jpg" alt='' />
                         <h4 className='text-lg font-medium'>Irbaz Soni</h4>
                     </div>
                     <div>

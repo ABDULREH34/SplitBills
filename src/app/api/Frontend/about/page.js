@@ -66,7 +66,7 @@ const About = () => {
         <div className="flex flex-col items-start w-1/2">
           <h2 className={`text-2xl font-bold ${isSustainabilityVisibtyle ? 'text-gray-500' : 'text-slate-700'} mb-4`}>Sustainability</h2>
           <img
-            src="Sustainability.jpeg"
+            src="/Sustainability.jpeg"
             alt="Sustainability Illustration"
             style={{ width: "400px", height: "300px" }}
             className="rounded-lg shadow-md hover:scale-110 hover:rotate-3 transition-all duration-500 ease-in-out cursor-pointer w-full md:w-2/4 lg:w-1/2"
@@ -79,7 +79,7 @@ const About = () => {
         <div className="flex flex-col items-start w-1/2">
           <h2 className={`text-2xl font-bold ${isRidesAndDeployVisible ? 'text-gray-500' : 'text-slate-700'} mb-4`}>Rides and Deploy</h2>
           <img
-            src="Ride&deploye.jpeg"
+            src="/Ride&deploye.jpeg"
             alt="Rides and Deploy Illustration"
             style={{ width: "400px", height: "300px" }}
             className="rounded-lg shadow-md hover:scale-110 hover:rotate-3 transition-all duration-500 ease-in-out cursor-pointer w-full md:w-2/4 lg:w-1/2"
@@ -91,7 +91,7 @@ const About = () => {
         <div className="flex flex-col items-start w-1/2">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">Your safety drives us</h2>
           <img
-            src="Safty.jpeg"
+            src="/Safty.jpeg"
             alt="Sustainability Illustration"
             style={{ width: "400px", height: "300px" }}
             className="rounded-lg shadow-md hover:scale-110 hover:rotate-3 transition-all duration-500 ease-in-out cursor-pointer w-full md:w-2/4 lg:w-1/2"

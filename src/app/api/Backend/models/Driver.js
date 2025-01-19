@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const UserSchema = new mongoose.Schema({
+const DriverSchema = new mongoose.Schema({
     fullname: {
         firstname: {
             type: String,
@@ -26,6 +26,24 @@ const UserSchema = new mongoose.Schema({
         required: true,
        
     },
+    VehicleInformation:{
+        vehicleColor: {
+            type: String,
+            required: true,
+        },
+        vehiclePlate: {
+            type: String,
+            required: true,
+        },
+        vehicleCapacity: {
+            type: Number,
+            required: true,
+        },
+        vehicleType: {
+            type: String,
+            required: true,
+        },  
+    },
     // Uncomment if you need a socket ID
     // socketId: {
     //     type: String,
@@ -39,7 +57,7 @@ const UserSchema = new mongoose.Schema({
 // Add an index for faster queries and unique email enforcement
 
 
-UserSchema.pre('save', async function (next) {
+DriverSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
 
     try {
@@ -54,7 +72,7 @@ UserSchema.pre('save', async function (next) {
 });
 
 // Generate JWT token
-UserSchema.methods.generateAccessToken = function () {
+DriverSchema.methods.generateAccessToken = function () {
     const token = jwt.sign(
         { _id: this._id },
         process.env.AccessToken,
@@ -63,7 +81,7 @@ UserSchema.methods.generateAccessToken = function () {
     return token;
 };
 
-UserSchema.methods.generateRefreshToken = function () {
+DriverSchema.methods.generateRefreshToken = function () {
     const token = jwt.sign(
         { _id: this._id },
         process.env.RefreshToken,
@@ -73,7 +91,7 @@ UserSchema.methods.generateRefreshToken = function () {
 };
 
 // Compare passwords
-UserSchema.methods.comparePassword = async function (candidatePassword) {
+DriverSchema.methods.comparePassword = async function (candidatePassword) {
     if (!candidatePassword) {
         throw new Error("Password argument is required");
     }
@@ -87,5 +105,5 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
 
 
 // Export the model
-export const User = mongoose.models.User || mongoose.model("User", UserSchema);
+export const Driver = mongoose.models.Driver || mongoose.model("Driver", DriverSchema);
 // export default mongoose.models.Contact || mongoose.model("Contact", contactSchema);

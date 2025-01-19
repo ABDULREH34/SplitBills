@@ -2,11 +2,13 @@
 import Link from 'next/link'; 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; 
 
 const Driverlogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [DriverData, setDriverData] = useState('');
+   const router = useRouter(); 
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -14,9 +16,14 @@ const Driverlogin = () => {
       email: email,
       password,
     });
+
+    router.push('/api/Frontend/home');
+
     setEmail('');
     setPassword('');
   };
+
+  
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center relative px-5">
@@ -59,14 +66,14 @@ const Driverlogin = () => {
           </form>
           <p className="text-center mt-6 text-lg text-gray-800">
             Join a fleet?{' '}
-            <Link href="/Driversignup" className="text-blue-600 font-medium">
+            <Link href="/api/Frontend/DriverDetailsAll/Driversignup" className="text-blue-600 font-medium">
               Register as a Driver
             </Link>
           </p>
         </div>
         <div className="mt-8 w-full max-w-lg">
           <Link
-            href="/Userlogin"
+            href="/api/Frontend/User/Userlogin"
             className="bg-[#d5622d] flex items-center justify-center text-white font-semibold rounded-lg px-5 py-3 w-full text-xl"
           >
             Sign in as User

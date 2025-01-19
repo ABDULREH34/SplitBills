@@ -15,7 +15,7 @@ const ConfirmRidePopUp = ({ setconfirmRidePopPanel}) => {
                 <div className="flex items-center gap-3">
                     <img
                         className="h-12 rounded-full object-cover w-12"
-                        src="people.jpg"
+                        src="/people.jpg"
                         alt=""
                     />
                     <h2 className="text-lg font-medium text-white">Mustak Ahmed</h2>

@@ -15,7 +15,7 @@ export default function ContactForm() {
         setLoading(true); 
 
         try {
-            const res = await fetch("/api/sync", {
+            const res = await fetch("/api/Backend/controller/userContact", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",

@@ -17,7 +17,7 @@ const DriverHome = () => {
     return (
         <div className="h-screen">
             <div className="fixed p-6 top-0 items-center justify-between w-screen flex">
-                <img className="w-16" src="logo.jpeg" alt="Logo" />
+                <img className="w-16" src="/logo.jpeg" alt="Logo" />
                 <Link
                     href="/DriverHome"
                     className="h-10 w-10 bg-white flex items-center justify-center rounded-full"

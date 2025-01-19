@@ -1,5 +1,6 @@
-import { connectToDatabase } from "@app/api/Backend/mongodb/db"; // Import your MongoDB connection utility
+ 
 import Contact from "@app/api/Backend/models/contact"; // Import the Contact model
+import { connectToDatabase } from "../../mongodb/db";
 
 export async function POST(req) {
   try {

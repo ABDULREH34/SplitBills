@@ -1,24 +1,23 @@
-// File: app/api/register/route.js
-import { connectToDatabase } from '@app/api/Backend/mongodb/db';
-import { userModel } from '@app/api/Backend/models/user';
-
+import { User } from "../../models/User";
+import { connectToDatabase } from "../../mongodb/db";
+import { generateToken } from "../generateToken/route";
+import { setCookie } from "../setCookie/route";
 
 export async function POST(req) {
     await connectToDatabase();
-    try {
 
-        const body = await req.json(); 
-        
+    try {
+        const body = await req.json();
         const { fullname, email, password } = body;
-        console.log(fullname);
-        
-        
-        const isUserAlready = await userModel.findOne({ email });
+
+        // Check if the user already exists
+        const isUserAlready = await User.findOne({ email });
         if (isUserAlready) {
             return new Response(JSON.stringify({ message: 'User already exists' }), { status: 400 });
         }
 
-        const user = await userModel.create({
+        // Create new user
+        const user = await User.create({
             fullname: {
                 firstname: fullname.firstname,
                 lastname: fullname.lastname,
@@ -26,16 +25,31 @@ export async function POST(req) {
             email,
             password,
         });
-
-
-        const token = user.generateAuthToken();
-        console.log(token);
         
-        // Send response
-        return new Response(
-            JSON.stringify({ token, user: { ...user.toJSON(), password: undefined } }),
+
+        // Generate tokens
+        const { accessToken, refreshToken } = await generateToken(user._id);
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+        
+
+        // Create response object without password and refreshToken
+        const response = new Response(
+            JSON.stringify({ 
+                user: { 
+                    ...user.toJSON(), 
+                    password: undefined,  // Exclude password
+                    refreshToken: undefined // Exclude refreshToken
+                } 
+            }),
             { status: 201 }
         );
+
+        // Apply cookies using setCookie
+        setCookie(response, accessToken, refreshToken);
+
+
+        return response;
     } catch (err) {
         return new Response(JSON.stringify({ message: err.message }), { status: 500 });
     }
