@@ -34,7 +34,7 @@ const UpdatePassword = () => {
 
       if (response.status === 200) {
         toast.success("Password updated successfully");
-        router.push("/api/Frontend/DriverDetailsAll/Driverlogin");
+        router.push("/api/Frontend/User/Userlogin");
       }
     } catch (err) {
       if (err.response) {

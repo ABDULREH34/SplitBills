@@ -10,11 +10,8 @@ export async function POST(req) {
         // Parse request body
         const body = await req.json();
         const { email, password } = body;
-        console.log(email);
-        
-    console.log(password);
-    
-        
+
+        // Validate input
         if (!email || !password) {
             return new Response(
                 JSON.stringify({ message: "Please fill all the details" }),
@@ -22,15 +19,15 @@ export async function POST(req) {
             );
         }
 
-        
+        // Find user in the database
         const user = await User.findOne({ email });
-        if (!user.password) {
+        if (!user) {
             return new Response(
                 JSON.stringify({ message: "Email Not Found" }),
                 { status: 400 }
             );
         }
-        
+
         // Check if the password matches
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
@@ -40,12 +37,17 @@ export async function POST(req) {
             );
         }
 
-  
+        // Generate tokens
         const { accessToken, refreshToken } = await generateToken(user._id);
-       
-        
+
+        console.log("Access Token:", accessToken);
+
+        // Set cookies
         const response = new Response(
-            JSON.stringify({ message: "Login Successfully" }),
+            JSON.stringify({
+                message: "Login successful",
+                accessToken: accessToken,
+            }),
             { status: 200 }
         );
 
@@ -53,8 +55,9 @@ export async function POST(req) {
 
         return response;
     } catch (error) {
+        console.error("Error during login:", error.message);
         return new Response(
-            JSON.stringify({ message: error.message }),
+            JSON.stringify({ message: "An error occurred during login" }),
             { status: 500 }
         );
     }

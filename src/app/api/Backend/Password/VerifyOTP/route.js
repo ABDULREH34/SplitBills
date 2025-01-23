@@ -3,13 +3,13 @@ import { connectToDatabase } from "../../mongodb/db";
 export async function POST (req ) {
   await connectToDatabase();
 
-  const { verifyOtp } = await req.json();
+  const { verifyCode } = await req.json();
 
   try {
-    console.log(verifyOtp);
-    const existingVerification = await Verify.findOne({ VerifyCode: verifyOtp });
+    console.log("Verify",verifyCode);
+    const existingVerification = await Verify.findOne({ VerifyCode: verifyCode });
 
-    if (existingVerification && existingVerification.VerifyCode) {
+    if (existingVerification) {
       return new Response(JSON.stringify({ message: "Verification Code is Right" }), { status: 200 });
     }
 

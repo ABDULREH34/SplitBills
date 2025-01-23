@@ -67,7 +67,7 @@ const InputItem = ({ type, locations = {}, onSubmit }) => {
   );
 };
 
-const MainComponent = () => {
+const SearchSection = () => {
   const [locations, setLocations] = useState({}); // Store parsed locations data
   const [loading, setLoading] = useState(true); // Loading state for fetch
   const [sourceLocation, setSourceLocation] = useState(""); // Track source location
@@ -137,8 +137,8 @@ const MainComponent = () => {
   };
 
   return (
-    <div className="p-5">
-      <h1 className="text-center text-xl font-bold mb-4">Select Locations</h1>
+    <div className="p-2 md:pd-6  rounded-lg">
+      <p className="text-[20px] font-bold">Get a Ride</p>
       <div className="mb-4">
         <InputItem
           type="source"
@@ -159,13 +159,13 @@ const MainComponent = () => {
       <div className="mt-4 text-center">
         <button
           onClick={handleSubmit}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+          className="p-3 bg-black w-full mt-5 text-white rounded-lg fond-semibold"
         >
-          Submit
+          Find a Trip
         </button>
       </div>
     </div>
   );
 };
 
-export default MainComponent;
+export default SearchSection;

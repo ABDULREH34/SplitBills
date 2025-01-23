@@ -22,7 +22,7 @@ const UpdatePassword = () => {
       }
 
       const response = await axios.post(
-        "/api/Backend/Password/ResetPassword",
+        "/api/Backend/DriverPassword/ResetPassword",
         { password },
         {
           headers: {

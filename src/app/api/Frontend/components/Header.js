@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { UserButton } from "@clerk/nextjs"; 
+
 
 const Header = () => {
     const headerMenu = [
@@ -65,7 +65,7 @@ const Header = () => {
                         ))}
                     </div>
                 </div>
-                <UserButton /> 
+                
             </div>
         </div>
     );

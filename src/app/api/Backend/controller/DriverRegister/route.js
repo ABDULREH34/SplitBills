@@ -1,56 +1,52 @@
-import { Driver } from "../../models/Driver";
 import { connectToDatabase } from "../../mongodb/db";
-import { generateToken } from "../generateToken/route";
-import { setCookie } from "../setCookie/route";
+import { sendVerificationEmail } from "../../Component/SendVerification/route";
+import { DriverDemo } from "../../models/DriverDemo";
 
 export async function POST(req) {
     await connectToDatabase();
 
     try {
         const body = await req.json();
-        const { fullname, email, password, VehicleInformation } = body;
+        const { username, email, password, vehicle } = body; 
 
-        // Check if the driver already exists
-        const isUserAlready = await Driver.findOne({ email });
-        if (isUserAlready) {
-            return new Response(JSON.stringify({ message: 'Driver already exists' }), { status: 400 });
-        }
+        const { firstname, lastname } = username;
 
-        // Create new driver
-        const driver = await Driver.create({
+        
+        const { vehicleType, vehicleCapacity, vehiclePlate, vehicleColor } = vehicle;
+
+        
+        const verifyCode = Math.floor(100000 + Math.random() * 900000); 
+
+        const verifyExpiry = new Date();
+        verifyExpiry.setMinutes(verifyExpiry.getMinutes() + 15);
+
+       
+        await sendVerificationEmail(email, verifyCode);
+
+        
+        const user = await DriverDemo.create({
             fullname: {
-                firstname: fullname.firstname,
-                lastname: fullname.lastname,
+                firstname,
+                lastname,
             },
             email,
             password,
+            verifyCode,
+            verifyExpiry,
             VehicleInformation: {
-                vehicleColor: VehicleInformation.vehicleColor,
-                vehiclePlate: VehicleInformation.vehiclePlate,
-                vehicleCapacity: VehicleInformation.vehicleCapacity,
-                vehicleType: VehicleInformation.vehicleType,
+                vehicleType,
+                vehicleCapacity,
+                vehiclePlate,
+                vehicleColor,
             },
         });
-
-        // Generate tokens
-        const { accessToken, refreshToken } = await generateToken(driver._id);
-        driver.refreshToken = refreshToken;
-        await driver.save({ validateBeforeSave: false });
-
-        // Create response object without password and refreshToken
+  
         const response = new Response(
             JSON.stringify({
-                driver: {
-                    ...driver.toJSON(),
-                    password: undefined,  
-                    refreshToken: undefined, 
-                },
+                message: "Email has been sent. Please check your inbox.",
             }),
             { status: 201 }
         );
-
-        // Apply cookies using setCookie
-        setCookie(response, accessToken, refreshToken);
 
         return response;
     } catch (err) {

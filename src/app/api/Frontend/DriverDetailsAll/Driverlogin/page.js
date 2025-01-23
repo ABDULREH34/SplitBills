@@ -17,7 +17,7 @@ const Driverlogin = () => {
       password,
     });
 
-    router.push('/api/Frontend/home');
+    router.push('/api/Frontend/DriverDetailsAll/Home');
 
     setEmail('');
     setPassword('');

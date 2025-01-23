@@ -4,12 +4,11 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';  // Import axios
+import { toast } from 'react-toastify';
 
 const Userlogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [message, setMessage] = useState('');
     const router = useRouter();
 
     const submitHandler = async (e) => {
@@ -17,7 +16,7 @@ const Userlogin = () => {
 
         // Check if both email and password are filled
         if (!email || !password) {
-            setError("Please enter both email and password.");
+            toast.error("Please enter both email and password.");
             return;
         }
 
@@ -28,16 +27,17 @@ const Userlogin = () => {
 
             // Check if the response status is 200 (success)
             if (response.status === 200) {
-                setMessage("Login successful!");
+                localStorage.setItem('AccessToken', response.data.accessToken);
+                toast.success("Login successful!");
                 router.push("/api/Frontend/DriverDetailsAll/DriverHome");
             } else {
-                setError("Invalid credentials, please try again.");
+                toast.error("Invalid credentials, please try again.");
             }
         } catch (err) {
             if (err.response) {
-                setError(err.response.data.message);  // Display specific error message from the server
+                toast.error(err.response.data.message);  
             } else {
-                setError("An error occurred. Please try again.");
+                toast.error("An error occurred. Please try again.");
             }
         }
 
@@ -79,7 +79,7 @@ const Userlogin = () => {
                         />
                         
                         <p className="text-xl font-medium mb-4">
-                            <Link href="/api/Frontend/User/ForgetPassword" className="text-blue-600 font-medium">
+                            <Link href="/api/Frontend/User/Password/ForgetPassword" className="text-blue-600 font-medium">
                                 Forgot your password?
                             </Link>
                         </p>
@@ -91,9 +91,6 @@ const Userlogin = () => {
                             Login
                         </button>
                     </form>
-
-                    {error && <div className="text-red-500 text-center mt-4">{error}</div>}
-                    {message && <div className="text-green-500 text-center mt-4">{message}</div>}
 
                     <p className="text-center mt-6 text-lg">
                         New here?{' '}

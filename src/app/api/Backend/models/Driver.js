@@ -51,6 +51,14 @@ const DriverSchema = new mongoose.Schema({
     refreshToken:{
         type: String,
         
+    },
+    location: {
+        ltd: {
+            type: Number,
+        },
+        lng: {
+            type: Number,
+        }
     }
 });
 

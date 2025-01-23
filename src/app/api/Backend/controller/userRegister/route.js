@@ -1,53 +1,42 @@
-import { User } from "../../models/User";
+import { userDemo } from "../../models/userDemo";
 import { connectToDatabase } from "../../mongodb/db";
-import { generateToken } from "../generateToken/route";
-import { setCookie } from "../setCookie/route";
+import { sendVerificationEmail } from "../../Component/SendVerification/route";
 
 export async function POST(req) {
     await connectToDatabase();
 
     try {
         const body = await req.json();
-        const { fullname, email, password } = body;
+        const { username, email, password } = body;
 
-        // Check if the user already exists
-        const isUserAlready = await User.findOne({ email });
-        if (isUserAlready) {
-            return new Response(JSON.stringify({ message: 'User already exists' }), { status: 400 });
-        }
+        
+        const { firstname, lastname } = username;
 
-        // Create new user
-        const user = await User.create({
+        
+        const verifyCode = Math.floor(100000 + Math.random() * 900000); 
+
+        
+        const verifyExpiry = new Date();
+        verifyExpiry.setMinutes(verifyExpiry.getMinutes() + 15);
+        await sendVerificationEmail(email, verifyCode);
+        const user = await userDemo.create({
             fullname: {
-                firstname: fullname.firstname,
-                lastname: fullname.lastname,
+                firstname,
+                lastname,
             },
             email,
             password,
+            verifyCode,
+            verifyExpiry
         });
-        
-
-        // Generate tokens
-        const { accessToken, refreshToken } = await generateToken(user._id);
-        user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave: false });
-        
-
-        // Create response object without password and refreshToken
+  
         const response = new Response(
-            JSON.stringify({ 
-                user: { 
-                    ...user.toJSON(), 
-                    password: undefined,  // Exclude password
-                    refreshToken: undefined // Exclude refreshToken
-                } 
+            JSON.stringify({
+                
+                message:"Email Has Sent Please Check"
             }),
             { status: 201 }
         );
-
-        // Apply cookies using setCookie
-        setCookie(response, accessToken, refreshToken);
-
 
         return response;
     } catch (err) {
