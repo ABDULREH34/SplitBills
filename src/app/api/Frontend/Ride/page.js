@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-
 import { User } from "lucide-react";
 import { gsap } from "gsap";
 import Header from "../components/Header";
@@ -10,7 +9,6 @@ import ConfirmRidePanel from "../components/Home1/ConfirmRidePanel";
 import LookingForDriverPanel from "../components/Home1/LookingForDriverPanel";
 
 const amountPerKm = 30; // Amount per kilometer in ₹
-const totalDistance = 10; // Example distance, replace with actual data from the search section
 
 // Data for all sections
 const ridesData = [
@@ -84,7 +82,8 @@ const calculatePrices = (distance, amountPerKm) => {
   }));
 };
 
-const Ride = () => {
+const Ride = ({ initialDistance = 10 }) => {
+  const [totalDistance, setTotalDistance] = useState(initialDistance); // Total distance in kilometers
   const [selectedCard, setSelectedCard] = useState(null);
   const [confirmRidePanel, setConfirmRidePanel] = useState(false);
   const [selectedRide, setSelectedRide] = useState(null);

@@ -74,6 +74,7 @@ const SearchSection = () => {
   const [destinationLocation, setDestinationLocation] = useState(""); // Track destination location
   const [distance, setDistance] = useState(null); // Distance result
   const [duration, setDuration] = useState(null); // Duration result
+  const [totalDistance,  setTotalDistance] = useState(null);
   const router = useRouter(); // Initialize the router for navigation
 
   const API_KEY = "AlzaSy8y4qb6gghIQfcUBXTwvmvP0vOvA8RN-vK"; // Google Maps API Key
@@ -153,6 +154,7 @@ const SearchSection = () => {
             console.log("Duration:", duration);
             setDistance(element.distance.text);
             setDuration(element.duration.text);
+            setTotalDistance(element.distance.value / 1000);
 
             // Redirect with additional query parameters
             router.push(
