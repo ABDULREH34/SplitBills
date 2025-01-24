@@ -9,6 +9,9 @@ import Header from "../components/Header";
 import ConfirmRidePanel from "../components/Home1/ConfirmRidePanel";
 import LookingForDriverPanel from "../components/Home1/LookingForDriverPanel";
 
+const amountPerKm = 30; // Amount per kilometer in ₹
+const totalDistance = 10; // Example distance, replace with actual data from the search section
+
 // Data for all sections
 const ridesData = [
   {
@@ -19,8 +22,6 @@ const ridesData = [
         name: "Premier",
         seats: 4,
         description: "Comfortable sedans, top-quality drivers",
-        discountPrice: 176.98,
-        originalPrice: 235.98,
         image: "/car1.jpg",
       },
       {
@@ -28,8 +29,6 @@ const ridesData = [
         name: "SplitXL",
         seats: 6,
         description: "Comfortable SUVs",
-        discountPrice: 273.64,
-        originalPrice: 348.64,
         image: "/car2.webp",
       },
       {
@@ -37,8 +36,6 @@ const ridesData = [
         name: "Split Go",
         seats: 4,
         description: "Affordable compact rides",
-        discountPrice: 146.04,
-        originalPrice: 194.72,
         image: "/car3.jpg",
       },
     ],
@@ -51,8 +48,6 @@ const ridesData = [
         name: "Split Care",
         seats: 4,
         description: "Handicap-friendly rides",
-        discountPrice: 154.43,
-        originalPrice: 205.91,
         image: "/handicap.png",
       },
       {
@@ -60,8 +55,6 @@ const ridesData = [
         name: "Split Pet",
         seats: 4,
         description: "Ride with your furry friend",
-        discountPrice: 100.5,
-        originalPrice: 200.72,
         image: "/economy1.png",
       },
     ],
@@ -74,13 +67,22 @@ const ridesData = [
         name: "Split More",
         seats: 4,
         description: "Explore other options",
-        discountPrice: 120.5,
-        originalPrice: 300.9,
         image: "/more1.png",
       },
     ],
   },
 ];
+
+const calculatePrices = (distance, amountPerKm) => {
+  return ridesData.map((section) => ({
+    ...section,
+    rides: section.rides.map((ride) => ({
+      ...ride,
+      originalPrice: distance * amountPerKm,
+      discountPrice: (distance * amountPerKm * 0.75).toFixed(2),
+    })),
+  }));
+};
 
 const Ride = () => {
   const [selectedCard, setSelectedCard] = useState(null);
@@ -88,17 +90,16 @@ const Ride = () => {
   const [selectedRide, setSelectedRide] = useState(null);
   const [lookingForDriver, setLookingForDriver] = useState(false);
 
+  const dynamicRidesData = calculatePrices(totalDistance, amountPerKm);
+
   const handleCardClick = (ride) => {
     if (selectedCard === ride.id) {
-      // If the same card is clicked, close the panel
       handleClosePanel();
     } else {
-      // Open the panel for the new ride
       setSelectedCard(ride.id);
       setSelectedRide(ride);
       setConfirmRidePanel(true);
 
-      // Animate panel appearance
       gsap.to(".confirm-ride-panel", {
         y: 0,
         opacity: 1,
@@ -109,7 +110,6 @@ const Ride = () => {
   };
 
   const handleClosePanel = () => {
-    // Animate panel hiding
     gsap.to(".confirm-ride-panel", {
       y: "100%",
       opacity: 0,
@@ -117,17 +117,15 @@ const Ride = () => {
       ease: "power3.in",
       onComplete: () => {
         setConfirmRidePanel(false);
-        setSelectedCard(null); // Reset the selected card
+        setSelectedCard(null);
       },
     });
   };
 
   const handleLookingForDriver = () => {
-    // This will trigger the "Looking for driver" panel to appear
     handleClosePanel();
     setLookingForDriver(true);
 
-    // Animate "Looking for driver" panel appearance
     gsap.to(".looking-for-driver-panel", {
       opacity: 1,
       y: 0,
@@ -138,7 +136,6 @@ const Ride = () => {
 
   return (
     <>
-      {/* Header */}
       <div
         style={{
           backgroundColor: "#ffffff",
@@ -149,7 +146,6 @@ const Ride = () => {
         <Header />
       </div>
 
-      {/* Background Video */}
       <div className="video-container">
         <video autoPlay muted loop className="background-video">
           <source src="/Animation.mp4" type="video/mp4" />
@@ -157,21 +153,17 @@ const Ride = () => {
         </video>
       </div>
 
-      {/* Content Section */}
       <div className="relative z-10">
-        {/* Page Title */}
         <div className="flex items-center justify-center font-bold text-black mt-2 text-3xl">
           Choose a ride
         </div>
 
-        {ridesData.map((sectionData, index) => (
+        {dynamicRidesData.map((sectionData, index) => (
           <div key={index} className="mt-4">
-            {/* Section Title */}
             <div className="flex items-center justify-center font-bold text-black text-xl">
               {sectionData.section}
             </div>
 
-            {/* Cards */}
             <div>
               {sectionData.rides.map((ride) => (
                 <div
@@ -214,35 +206,31 @@ const Ride = () => {
         ))}
       </div>
 
-      {/* Confirm Ride Panel */}
       {confirmRidePanel && (
         <>
-          {/* Backdrop */}
           <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
 
-          {/* Modal */}
           <div
             className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg p-6 z-50 transform transition-transform 
             ${confirmRidePanel ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}
           >
             <ConfirmRidePanel ride={selectedRide} onClose={handleClosePanel} onConfirm={handleLookingForDriver} />
-
           </div>
         </>
       )}
 
       {lookingForDriver && (
         <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-          <div className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg p-6 z-50 transform transition-transform 
-            ${lookingForDriver ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}>
+            className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg p-6 z-50 transform transition-transform 
+            ${lookingForDriver ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}
+          >
             <LookingForDriverPanel ride={selectedRide} onClose={() => setLookingForDriver(false)} />
           </div>
         </>
       )}
 
-      {/* Styles */}
       <style jsx>{`
         .video-container {
           position: fixed;

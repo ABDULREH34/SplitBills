@@ -72,7 +72,11 @@ const SearchSection = () => {
   const [loading, setLoading] = useState(true); // Loading state for fetch
   const [sourceLocation, setSourceLocation] = useState(""); // Track source location
   const [destinationLocation, setDestinationLocation] = useState(""); // Track destination location
+  const [distance, setDistance] = useState(null); // Distance result
+  const [duration, setDuration] = useState(null); // Duration result
   const router = useRouter(); // Initialize the router for navigation
+
+  const API_KEY = "AlzaSy8y4qb6gghIQfcUBXTwvmvP0vOvA8RN-vK"; // Google Maps API Key
 
   useEffect(() => {
     // Predefined list of locations
@@ -127,10 +131,44 @@ const SearchSection = () => {
   };
 
   // Handle Submit button click to redirect
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (sourceLocation && destinationLocation) {
-      // Redirect to another page (you can replace the URL with your desired path)
-      router.push(`/api/Frontend/Ride?source=${sourceLocation}&destination=${destinationLocation}`);
+      try {
+        // Fetch distance using Google Maps API
+        const response = await fetch(
+          `https://maps.gomaps.pro/maps/api/distancematrix/json?origins=${encodeURIComponent(
+            sourceLocation
+          )}&destinations=${encodeURIComponent(destinationLocation)}&key=${API_KEY}`
+        );
+        const data = await response.json();
+
+        if (data.status === "OK") {
+          const element = data.rows[0].elements[0];
+          if (element.status === "OK") {
+            const distance = element.distance.text;
+            const duration = element.duration.text;
+  
+            // Log the distance and duration to the console
+            console.log("Distance:", distance);
+            console.log("Duration:", duration);
+            setDistance(element.distance.text);
+            setDuration(element.duration.text);
+
+            // Redirect with additional query parameters
+            router.push(
+              `/api/Frontend/Ride?source=${sourceLocation}&destination=${destinationLocation}&distance=${element.distance.value}&duration=${element.duration.value}`
+            );
+            
+          } else {
+            alert("Unable to calculate distance. Please try again.");
+          }
+        } else {
+          alert("Error fetching distance data. Please check your input.");
+        }
+      } catch (error) {
+        console.error("Error fetching distance:", error);
+        alert("Failed to fetch distance data.");
+      }
     } else {
       alert("Please select both source and destination locations.");
     }
@@ -155,6 +193,12 @@ const SearchSection = () => {
         />
         {destinationLocation && <div>Selected Dropoff: {destinationLocation}</div>}
       </div>
+      {distance && duration && (
+        <div className="mt-4">
+          <p>Distance: {distance}</p>
+          <p>Duration: {duration}</p>
+        </div>
+      )}
       {/* Submit Button */}
       <div className="mt-4 text-center">
         <button
