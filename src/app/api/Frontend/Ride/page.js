@@ -8,9 +8,9 @@ import Header from "../components/Header";
 import ConfirmRidePanel from "../components/Home1/ConfirmRidePanel";
 import LookingForDriverPanel from "../components/Home1/LookingForDriverPanel";
 
-const amountPerKm = 30; // Amount per kilometer in ₹
+const amountPerKm = 25; 
 
-// Data for all sections
+
 const ridesData = [
   {
     section: "Recommended",
@@ -72,18 +72,28 @@ const ridesData = [
 ];
 
 const calculatePrices = (distance, amountPerKm) => {
+  const multipliers = {
+    1: 1, // Premier
+    2: 1.5, // SplitXL
+    3: 0.9, // Split Go
+    4: 0.85, // Split Care
+    5: 0.8, // Split Pet
+    6: 0.95, // Split More
+  };
+
   return ridesData.map((section) => ({
     ...section,
     rides: section.rides.map((ride) => ({
       ...ride,
-      originalPrice: distance * amountPerKm,
-      discountPrice: (distance * amountPerKm * 0.75).toFixed(2),
+      originalPrice: Math.round(distance * amountPerKm * multipliers[ride.id]),
+      discountPrice: Math.round(distance * amountPerKm * multipliers[ride.id] * 0.75)
     })),
   }));
 };
 
+
 const Ride = ({ initialDistance = 10 }) => {
-  const [totalDistance, setTotalDistance] = useState(initialDistance); // Total distance in kilometers
+  const [totalDistance, setTotalDistance] = useState(initialDistance); 
   const [selectedCard, setSelectedCard] = useState(null);
   const [confirmRidePanel, setConfirmRidePanel] = useState(false);
   const [selectedRide, setSelectedRide] = useState(null);
