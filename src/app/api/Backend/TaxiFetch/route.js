@@ -1,94 +1,55 @@
-import Taxi from "../models/taxi";
-import { connectToDatabase } from "../mongodb/db";
+import fs from 'fs/promises';
+import path from 'path';
 
-export async function POST(req) {
+export async function GET(req) {
     try {
-        console.log("Request received"); 
-        const body = await req.json(); 
-        console.log("Request Body:", body); 
+        console.log("Fetching taxi fares from file...");
 
-        const { pickup, destination } = body;
+        // ✅ Set file path from the public folder
+        const filePath = path.join(process.cwd(), 'public', 'newtaxiFare.txt');
 
-        // Validate request body
-        if (!pickup || !destination) {
-            console.error("Pickup or destination missing"); 
-            return new Response(
-                JSON.stringify({ message: "Pickup and destination are required" }),
-                { status: 400 }
-            );
+        // ✅ Read the file
+        let fileContent = await fs.readFile(filePath, 'utf-8');
+
+        // ✅ Parse JSON data
+        const faresData = JSON.parse(fileContent);
+
+        // ✅ Extract query parameters
+        const { searchParams } = new URL(req.url);
+        const pickup = searchParams.get("pickup");
+        const destination = searchParams.get("destination");
+        console.log(pickup, destination);
+        
+
+        let result;
+        if (pickup && destination) {
+            // ✅ Check if both pickup and destination match
+            if (faresData[pickup]?.[destination]) {
+                result = {
+                    pickup,
+                    destination,
+                    price: faresData[pickup][destination].price,
+                    km: faresData[pickup][destination].km
+                };
+            } else {
+                result = { message: "No fare found for this route" };
+            }
+        } else {
+            result = { message: "Please provide both pickup and destination." };
         }
 
-        await connectToDatabase(); 
-        console.log("Database connected"); 
+        console.log(result);
 
-        // Fetch data from database
-        const data = await Taxi.findOne({});
-
-        // Check if pickup exists in the data
-        if (data && data[pickup]) {
-            const pickupData = data[pickup]; 
-            console.log("Pickup Data:", pickupData); 
-
- 
-            if (pickupData.price && pickupData.km) {
-                const destinationData = data[destination];
-                if (pickupData) {
-                    console.log("Destination Data:", destinationData); 
-                    return new Response(
-                        JSON.stringify({
-                            pickup,
-                            destination,
-                            price: pickupData.price,
-                            km: pickupData.km,
-                            ...destinationData,
-                        }),
-                        { status: 200 }
-                    );
-                }
-                return new Response(
-                    JSON.stringify({
-                        pickup,
-                        price: pickupData.price,
-                        km: pickupData.km,
-                        message: "Destination data not available for flat structure",
-                    }),
-                    { status: 200 }
-                );
-            }
-
-            // Handle nested structure: pickup contains nested destinations
-            const destinationData = pickupData[destination];
-            if (destinationData) {
-                console.log("Destination Data:", destinationData); 
-                return new Response(
-                    JSON.stringify({
-                        pickup,
-                        destination,
-                        price: destinationData.price,
-                        km: destinationData.km,
-                        ...destinationData,
-                    }),
-                    { status: 200 }
-                );
-            }
-        }
-
-        // Data not found for given pickup or destination
-        console.error("Data not found for the given pickup and destination");
         return new Response(
-            JSON.stringify({
-                message: "Data not found for the given pickup and destination",
-            }),
-            { status: 404 }
+            JSON.stringify(result),
+            { status: 200, headers: { "Content-Type": "application/json" } }
         );
+
     } catch (error) {
         console.error("Error:", error.message);
         return new Response(
-            JSON.stringify({
-                message: "Error fetching data",
-                error: error.message,
-            }),
-            { status: 500 }
+            JSON.stringify({ message: "Error fetching data", error: error.message }),
+            { status: 500, headers: { "Content-Type": "application/json" } }
         );
     }
 }

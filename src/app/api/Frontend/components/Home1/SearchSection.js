@@ -1,23 +1,28 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // To handle redirection
+import { useRouter } from "next/navigation"; // Import the router
 
-const InputItem = ({ type, locations = {}, onSubmit }) => {
+const InputItem = ({ type, onSubmit }) => {
   const [query, setQuery] = useState(""); // User input
   const [suggestions, setSuggestions] = useState([]); // Suggestions list
 
-  const onInputChange = (e) => {
+  const onInputChange = async (e) => {
     const value = e.target.value;
     setQuery(value);
 
     if (value.trim()) {
-      // Filter locations immediately based on input
-      const filteredSuggestions = Object.keys(locations).filter((location) =>
-        location.toLowerCase().startsWith(value.toLowerCase()) // Match from the beginning
-      );
+      try {
+        // Fetch locations from the backend
+        const response = await fetch(`/api/Backend/TaxiKey`);
+        const locationsData = await response.json();
 
-      setSuggestions(filteredSuggestions); // Update the suggestions
+        // Show all locations if user starts typing
+        setSuggestions(locationsData); // Show all locations as suggestions
+      } catch (error) {
+        console.error("Error fetching location suggestions:", error);
+        setSuggestions([]); // Clear suggestions on error
+      }
     } else {
       setSuggestions([]); // Clear suggestions if input is empty
     }
@@ -68,59 +73,30 @@ const InputItem = ({ type, locations = {}, onSubmit }) => {
 };
 
 const SearchSection = () => {
-  const [locations, setLocations] = useState({}); // Store parsed locations data
+  const [locations, setLocations] = useState([]); // Store parsed locations data
   const [loading, setLoading] = useState(true); // Loading state for fetch
   const [sourceLocation, setSourceLocation] = useState(""); // Track source location
   const [destinationLocation, setDestinationLocation] = useState(""); // Track destination location
-  const [distance, setDistance] = useState(null); // Distance result
-  const [duration, setDuration] = useState(null); // Duration result
-  const [totalDistance,  setTotalDistance] = useState(null);
-  const router = useRouter(); // Initialize the router for navigation
-
-  const API_KEY = "AlzaSy8y4qb6gghIQfcUBXTwvmvP0vOvA8RN-vK"; // Google Maps API Key
+  const router = useRouter(); // Initialize router
 
   useEffect(() => {
-    // Predefined list of locations
-    const predefinedLocations = [
-      "Cheeta Camp",
-      "Thane",
-      "Santacruz",
-      "Bhandup",
-      "Nerul",
-      "Chembur",
-      "Kurla",
-      "Mulund",
-      "Andheri",
-      "Matunga",
-      "Vikhroli",
-      "Vashi",
-      "Bandra",
-      "Belapur",
-      "Wadala",
-      "Sion",
-      "Govandi",
-      "Kanjurmarg",
-      "Dadar",
-      "Ghatkopar",
-      "Powai"
-    ];
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch("/api/Backend/TaxiKey"); // Call your API
+        const data = await response.json();
+        setLocations(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+        setLoading(false);
+      }
+    };
 
-    // Convert the list into an object with null values
-    const locationsObj = predefinedLocations.reduce((acc, location) => {
-      acc[location] = null;
-      return acc;
-    }, {});
-
-    setLocations(locationsObj); // Set the predefined locations
-    setLoading(false);
+    fetchLocations();
   }, []);
 
   if (loading) {
     return <div>Loading locations...</div>;
-  }
-
-  if (!Object.keys(locations).length) {
-    return <div>Error loading locations. Please try again later.</div>;
   }
 
   const handleSourceSubmit = (location) => {
@@ -131,58 +107,22 @@ const SearchSection = () => {
     setDestinationLocation(location); // Set the destination location when selected
   };
 
-  // Handle Submit button click to redirect
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (sourceLocation && destinationLocation) {
-      try {
-        // Fetch distance using Google Maps API
-        const response = await fetch(
-          `https://maps.gomaps.pro/maps/api/distancematrix/json?origins=${encodeURIComponent(
-            sourceLocation
-          )}&destinations=${encodeURIComponent(destinationLocation)}&key=${API_KEY}`
-        );
-        const data = await response.json();
-
-        if (data.status === "OK") {
-          const element = data.rows[0].elements[0];
-          if (element.status === "OK") {
-            const distance = element.distance.text;
-            const duration = element.duration.text;
-  
-            // Log the distance and duration to the console
-            console.log("Distance:", distance);
-            console.log("Duration:", duration);
-            setDistance(element.distance.text);
-            setDuration(element.duration.text);
-            setTotalDistance(element.distance.value / 1000);
-
-            // Redirect with additional query parameters
-            router.push(
-              `/api/Frontend/Ride?source=${sourceLocation}&destination=${destinationLocation}&distance=${element.distance.value}&duration=${element.duration.value}`
-            );
-            
-          } else {
-            alert("Unable to calculate distance. Please try again.");
-          }
-        } else {
-          alert("Error fetching distance data. Please check your input.");
-        }
-      } catch (error) {
-        console.error("Error fetching distance:", error);
-        alert("Failed to fetch distance data.");
-      }
+      router.push(
+        `/api/Frontend/Ride?source=${sourceLocation}&destination=${destinationLocation}`
+      ); // Redirect when button is clicked
     } else {
-      alert("Please select both source and destination locations.");
+      alert("Please select both source and destination locations."); // Alert if locations are not selected
     }
   };
 
   return (
-    <div className="p-2 md:pd-6  rounded-lg">
+    <div className="p-2 md:pd-6 rounded-lg">
       <p className="text-[20px] font-bold">Get a Ride</p>
       <div className="mb-4">
         <InputItem
           type="source"
-          locations={locations}
           onSubmit={handleSourceSubmit} // Pass the submit function
         />
         {sourceLocation && <div>Selected Pickup: {sourceLocation}</div>}
@@ -190,22 +130,15 @@ const SearchSection = () => {
       <div className="mb-4">
         <InputItem
           type="destination"
-          locations={locations}
           onSubmit={handleDestinationSubmit} // Pass the submit function
         />
         {destinationLocation && <div>Selected Dropoff: {destinationLocation}</div>}
       </div>
-      {distance && duration && (
-        <div className="mt-4">
-          <p>Distance: {distance}</p>
-          <p>Duration: {duration}</p>
-        </div>
-      )}
-      {/* Submit Button */}
+      {/* Button Added back */}
       <div className="mt-4 text-center">
         <button
-          onClick={handleSubmit}
-          className="p-3 bg-black w-full mt-5 text-white rounded-lg fond-semibold"
+          onClick={handleSubmit} // Trigger router.push when button is clicked
+          className="p-3 bg-black w-full mt-5 text-white rounded-lg font-semibold"
         >
           Find a Trip
         </button>
