@@ -5,7 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 import { toast } from "react-toastify";
 
-export default function Home() {
+export default function ForgetPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -15,10 +15,12 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/Backend/Password/ForgetPassword", { email });
+      const response = await axios.post("/api/Backend/DriverPassword/ForgetPassword", { email });
+      console.log("Email Response:", response);
+      
       if (response.status === 200) {
         toast.success("Email found. Redirecting...");
-        router.push("/api/Frontend/User/Password/Verify");
+        router.push("/api/Frontend/DriverDetailsAll/Password/DriverVerify");
       } else {
         toast.error("Email does not exist.");
       }

@@ -23,6 +23,7 @@ export async function POST(req) {
 
     let decoded;
     try {
+      console.log("Received Token:", token);
       decoded = jwt.verify(token, process.env.AccessToken);
     } catch (err) {
       console.error("Authentication failed:", err.message);
@@ -45,13 +46,13 @@ export async function POST(req) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     
-    const updatedUser = await Driver.findByIdAndUpdate(
+    const updatedDriver = await Driver.findByIdAndUpdate(
       decoded._id,
       { $set: { password: hashedPassword } },
       { new: true }
     );
 
-    if (!updatedUser) {
+    if (!updatedDriver) {
       return new Response(
         JSON.stringify({ message: "Password not updated" }),
         { status: 401 }

@@ -23,8 +23,7 @@ export async function POST(req) {
        
         await sendVerificationEmail(email, verifyCode);
 
-        
-        const user = await DriverDemo.create({
+        console.log("Received Data:", {
             fullname: {
                 firstname,
                 lastname,
@@ -40,6 +39,24 @@ export async function POST(req) {
                 vehicleColor,
             },
         });
+        const user = await DriverDemo.create({
+            fullname: {
+                firstname,
+                lastname,
+            },
+            email,
+            password,
+            verifyCode,
+            verifyExpiry,
+            VehicleInformation: {
+                vehicleType,
+                vehicleCapacity:Number(vehicleCapacity),
+                vehiclePlate,
+                vehicleColor,
+            },
+        });
+        
+        
   
         const response = new Response(
             JSON.stringify({

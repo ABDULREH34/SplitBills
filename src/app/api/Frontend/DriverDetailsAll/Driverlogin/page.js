@@ -1,14 +1,14 @@
 "use client";
-import Link from 'next/link'; 
+import Link from 'next/link';
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 
 const Driverlogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [DriverData, setDriverData] = useState('');
-   const router = useRouter(); 
+  const router = useRouter();
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -23,16 +23,16 @@ const Driverlogin = () => {
     setPassword('');
   };
 
-  
+
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center relative px-5">
       {/* Background Image */}
-      <Image 
-        src="/split.jpeg" 
-        alt="Split bills" 
-        fill 
-        className="object-cover" 
+      <Image
+        src="/split.jpeg"
+        alt="Split bills"
+        fill
+        className="object-cover"
       />
 
       <div className="absolute inset-0 flex flex-col justify-center items-center px-5 md:px-32">
@@ -57,6 +57,13 @@ const Driverlogin = () => {
               type="password"
               placeholder="password"
             />
+
+            <p className="text-xl font-medium mb-4">
+              <Link href="/api/Frontend/DriverDetailsAll/Password/ForgetPassword1" className="text-blue-600 font-medium">
+                Forgot your password?
+              </Link>
+            </p>
+
             <button
               type="submit"
               className="bg-black text-white font-semibold rounded-lg px-5 py-3 w-full text-xl"
@@ -71,7 +78,7 @@ const Driverlogin = () => {
             </Link>
           </p>
         </div>
-        <div className="mt-8 w-full max-w-lg">
+        <div className="mt-4 w-full max-w-lg">
           <Link
             href="/api/Frontend/User/Userlogin"
             className="bg-[#d5622d] flex items-center justify-center text-white font-semibold rounded-lg px-5 py-3 w-full text-xl"

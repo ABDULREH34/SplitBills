@@ -5,7 +5,7 @@ import Image from "next/image";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const VerifyUser = () => {
+const VerifyDriver = () => {
   const [verifyCode, setVerifyCode] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -37,8 +37,8 @@ const VerifyUser = () => {
       );
 
       if (response.status === 200) {
-        toast.success("User verified successfully!");
-        router.push("/api/Frontend/User/Password/ResetPassword");
+        toast.success("Driver verified successfully!");
+        router.push("/api/Frontend/DriverDetailsAll/Password/ResetPassword");
       }
     } catch (err) {
       if (err.response) {
@@ -89,4 +89,4 @@ const VerifyUser = () => {
   );
 };
 
-export default VerifyUser;
+export default VerifyDriver;
