@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User } from "lucide-react";
 import { gsap } from "gsap";
 import Header from "../components/Header";
 import ConfirmRidePanel from "../components/Home1/ConfirmRidePanel";
 import LookingForDriverPanel from "../components/Home1/LookingForDriverPanel";
 
-const amountPerKm = 25; 
-
+const amountPerKm = 25;
 
 const ridesData = [
   {
@@ -86,14 +86,20 @@ const calculatePrices = (distance, amountPerKm) => {
     rides: section.rides.map((ride) => ({
       ...ride,
       originalPrice: Math.round(distance * amountPerKm * multipliers[ride.id]),
-      discountPrice: Math.round(distance * amountPerKm * multipliers[ride.id] * 0.75)
+      discountPrice: Math.round(distance * amountPerKm * multipliers[ride.id] * 0.75),
     })),
   }));
 };
 
+const Ride = () => {
+  const searchParams = useSearchParams();
+  const distanceFromQuery = searchParams.get("distance");
+  const pickupLocation = searchParams.get("pickup");
+  const destinationLocation = searchParams.get("destination");
 
-const Ride = ({ initialDistance = 10 }) => {
-  const [totalDistance, setTotalDistance] = useState(initialDistance); 
+  const [totalDistance, setTotalDistance] = useState(
+    distanceFromQuery ? parseFloat(distanceFromQuery) / 1000 : 10 // Convert meters to kilometers
+  );
   const [selectedCard, setSelectedCard] = useState(null);
   const [confirmRidePanel, setConfirmRidePanel] = useState(false);
   const [selectedRide, setSelectedRide] = useState(null);
@@ -223,7 +229,14 @@ const Ride = ({ initialDistance = 10 }) => {
             className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg p-6 z-50 transform transition-transform 
             ${confirmRidePanel ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}
           >
-            <ConfirmRidePanel ride={selectedRide} onClose={handleClosePanel} onConfirm={handleLookingForDriver} />
+            <ConfirmRidePanel
+              ride={selectedRide}
+              pickupLocation={pickupLocation}
+              destinationLocation={destinationLocation}
+              totalDistance={totalDistance}
+              onClose={handleClosePanel}
+              onConfirm={handleLookingForDriver}
+            />
           </div>
         </>
       )}

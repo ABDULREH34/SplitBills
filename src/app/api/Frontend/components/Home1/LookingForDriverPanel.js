@@ -1,21 +1,13 @@
-import LookingForDriver from "@app/api/Frontend/DriverDetailsAll/LookingForDriver/page"; // Ensure this path is correct for your project
+"use client";
 
-const LookingForDriverPanel = ({ ride, onClose, onConfirm }) => {
+import React from "react";
+
+const LookingForDriverPanel = ({ ride, onClose }) => {
   return (
-    <div className="relative">
-      {/* Modal Header */}
-      <div
-        className="flex justify-center items-center mb-4 cursor-pointer"
-        onClick={onClose} 
-      >
-        <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
-      </div>
-
-    
-
-
-      {/* Render LookingForDriver Component */}
-      <LookingForDriver />
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-2">Looking for a Driver</h2>
+      <p>We are finding a driver for your {ride?.name} ride.</p>
+      <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 mt-4 rounded">Cancel</button>
     </div>
   );
 };

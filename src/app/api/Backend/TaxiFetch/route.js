@@ -19,6 +19,7 @@ export async function GET(req) {
         const pickup = searchParams.get("pickup");
         const destination = searchParams.get("destination");
         console.log(pickup, destination);
+        console.log("Full fares data:", faresData);
         
 
         let result;
