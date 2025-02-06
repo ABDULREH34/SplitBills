@@ -1,58 +1,98 @@
 "use client";
-import React from 'react'
-import Link from 'next/link'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { IndianRupee } from "lucide-react"; // Import Indian Rupee icon
 
-const FinishRidePanel = () => {
+const FinishRidePanel = ({ setRidePopupPanel = () => {} }) => {
+    const [ride, setRide] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Debugging: Check if setRidePopupPanel is received correctly
+    useEffect(() => {
+        console.log("setRidePopupPanel:", setRidePopupPanel);
+    }, []);
+
+    // Fetch latest ride details from backend
+    const fetchRideDetails = async () => {
+        try {
+            const response = await fetch("/api/Backend/controller/FetchRideDetails", { cache: "no-store" });
+            const data = await response.json();
+            
+            if (data.success && data.data.length > 0) {
+                // Sort rides by date in descending order and get the latest ride
+                const sortedRides = data.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                setRide(sortedRides[0]);
+            } else {
+                console.error("Error fetching ride details:", data.message);
+            }
+        } catch (error) {
+            console.error("Failed to fetch ride data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchRideDetails();
+    }, []);
+
+    if (loading) return <p className="text-center text-gray-500">Loading ride details...</p>;
+    if (!ride) return <p className="text-center text-gray-500">No ride details available.</p>;
+
     return (
-        <div>
-            <h5
-                className="p-1 text-center w-[93%] absolute top-0 cursor-pointer"
-                onClick={() => setRidePopupPanel(false)}
-            >
-                <i className="text-3xl text-gray-200 ri-arrow-down-s-line"></i>
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-6 rounded-t-2xl shadow-lg">
+            {/* Close Button */}
+            <h5 className="p-1 text-center w-full cursor-pointer" onClick={() => setRidePopupPanel(false)}>
+                <i className="text-3xl text-gray-400 ri-arrow-down-s-line"></i>
             </h5>
-            <h3 className="text-2xl font-semibold mb-5">Finish this Ride</h3>
-            <div className="flex items-center justify-between p-4 border-2 bg-black rounded-lg mt-4">
+            <h3 className="text-2xl font-semibold mb-5 text-left">Finish this Ride</h3>
+
+            {/* Rider Info */}
+            <div className="flex items-center justify-between p-4 bg-black rounded-lg">
                 <div className="flex items-center gap-3">
-                    <img
-                        className="h-12 rounded-full object-cover w-12"
-                        src="/people.jpg"
-                        alt=""
-                    />
-                    <h2 className="text-lg font-medium text-white">Mustak Ahmed</h2>
+                    <img className='h-10 w-10 rounded-full object-cover' src="/people.jpg" alt='' />
+                    <h2 className="text-lg font-medium text-white">{ride?.riderName || "ABC Rider"}</h2>
                 </div>
-                <h5 className="text-lg font-semibold text-white">2.2 KM</h5>
+                <h5 className="text-lg font-semibold text-white">{ride?.totalDistance ? `${ride.totalDistance} KM` : "N/A"}</h5>
             </div>
-            <div className="flex gap-2 justify-between flex-col items-center">
-                <div className="w-full mt-5">
-                    <div className="flex items-center gap-5 p-3 border-b-2">
-                        <i className="ri-map-pin-user-fill"></i>
-                        <div>
-                            <h3 className="text-lg font-medium">562/11-A</h3>
-                            <p className="text-sm -mt-1 text-gray-600">Cheeta Camp</p>
-                        </div>
-                    </div>
-                    <div className="flex item-center gap-5 p-3 border-b-2">
-                        <i className="text-lg ri-map-pin-2-fill"></i>
-                        <div>
-                            <h3 className="text-lg font-medium">562/11-A</h3>
-                            <p className="text-sm -mt-1 text-gray-600">Vashi</p>
-                        </div>
-                    </div>
-                    <div className='flex items-center gap-5 p-3'>
-                        <i className="ri-currency-line"></i>
-                        <div>
-                            <h3 className="text-lg font-medium">300</h3>
-                            <p className="text-sm -mt-1 text-gray-600">Cash Cash</p>
-                        </div>
-                    </div>
-                    <div className='mt-10 w-full'>
-                        <Link href='/api/Frontend/DriverDetailsAll/DriverHome' className='bg-black mt-2 flex justify-center w-full text-white font-semibold p-2 px-10 rounded-lg'>Finish Ride</Link>
+
+            {/* Ride Details */}
+            <div className="w-full mt-5">
+                {/* Pickup Location */}
+                <div className="flex items-center gap-5 p-3 border-b-2">
+                    <i className="text-gray-600 w-5 h-5 ri-map-pin-2-fill"></i>
+                    <div>
+                        <h3 className="text-lg font-medium">{ride?.pickupLocation || "Unknown Pickup"}</h3>
                     </div>
                 </div>
+
+                {/* Destination Location */}
+                <div className="flex items-center gap-5 p-3 border-b-2">
+                    <i className="text-gray-600 w-5 h-5 ri-map-pin-2-fill"></i>
+                    <div>
+                        <h3 className="text-lg font-medium">{ride?.destinationLocation || "Unknown Destination"}</h3>
+                    </div>
+                </div>
+
+                {/* Price */}
+                <div className="flex items-center gap-5 p-3">
+                    <i className="text-yellow-500 w-5 h-5 ri-currency-line"></i>
+                    <div>
+                        <h3 className="text-lg font-medium">{ride?.price || "0"}</h3>
+                        <p className="text-sm -mt-1 text-gray-600">Cash Payment</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="mt-6 w-full">
+                <Link href="/api/Frontend/DriverDetailsAll/DriverHome" className="bg-black flex justify-center w-full text-white font-semibold p-2 px-10 rounded-lg">
+                    Finish Ride
+                </Link>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default FinishRidePanel
+export default FinishRidePanel;

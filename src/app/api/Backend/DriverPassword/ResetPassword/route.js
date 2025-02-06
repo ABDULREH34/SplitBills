@@ -33,6 +33,17 @@ export async function POST(req) {
       );
     }
 
+    console.log("Decoded Token:", decoded);
+
+    const existingDriver = await Driver.findById(decoded._id);
+    console.log("Existing Driver:", existingDriver);
+
+    if (!existingDriver) {
+      return new Response(
+        JSON.stringify({ message: "Driver not found" }),
+        { status: 404 }
+      );
+    }
     
     const { password } = await req.json();
     if (!password) {

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { MapPin, DollarSign, Ruler } from "lucide-react";
+import { MapPin, IndianRupee, Ruler } from "lucide-react"; // Import Indian Rupee icon
 import { toast } from "react-toastify";
 
 const ConfirmRidePanel = ({ ride, pickupLocation, destinationLocation, totalDistance, onClose, onConfirm }) => {
@@ -14,7 +14,7 @@ const ConfirmRidePanel = ({ ride, pickupLocation, destinationLocation, totalDist
       totalDistance,
       price: ride?.discountPrice || 0,
     };
-
+  
     try {
       const response = await fetch('/api/Backend/controller/saverequest', {
         method: 'POST',
@@ -23,20 +23,23 @@ const ConfirmRidePanel = ({ ride, pickupLocation, destinationLocation, totalDist
         },
         body: JSON.stringify(rideData),
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Ride saved:', data);
-        toast.success("Your data has been successfully stored");
-        onClose();
-      } else {
+  
+      if (!response.ok) {
         const error = await response.json();
-        toast.error("Failed to save your data.");
+        throw new Error(error.message || "Failed to save your ride request");
       }
+  
+      const data = await response.json(); // ✅ Parse JSON response
+      console.log("✅ Ride saved:", data);
+      toast.success("Your ride has been successfully stored!");
+  
+      onClose();
     } catch (error) {
-      console.error('Error:', error);
+      console.error("🚨 Error:", error);
+      toast.error(error.message || "An error occurred while saving the ride.");
     }
   };
+  
 
   return (
     <div className="p-4 flex flex-col items-center bg-white rounded-lg shadow-lg">
@@ -87,9 +90,9 @@ const ConfirmRidePanel = ({ ride, pickupLocation, destinationLocation, totalDist
 
         {/* Price */}
         <div className="flex items-center gap-2">
-          <DollarSign className="text-yellow-500" />
+          <IndianRupee className="text-yellow-500" />
           <p className="font-medium text-xl text-gray-800">
-            ₹{ride?.discountPrice || "Not available"}
+            {ride?.discountPrice || "Not available"}
           </p>
         </div>
       </div>

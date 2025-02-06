@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-
+import Link from 'next/link';
 
 const About = () => {
   // Separate state for each section's content visibility
@@ -137,6 +137,13 @@ const About = () => {
           under the guidance of <strong>Mrs. Shital Patil</strong>, as part of their Bachelor of Science (Information Technology)
           program at Vivekanand Education Society’s College of Arts, Science, and Commerce, Mumbai.
         </p>
+      </div>
+      <div className="flex justify-center mt-6">
+        <Link href="/api/Frontend/home" passHref>
+          <button className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+            Go Home
+          </button>
+        </Link>
       </div>
 
     </div>

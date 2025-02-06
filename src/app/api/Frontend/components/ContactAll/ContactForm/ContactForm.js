@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function ContactForm() {
     const [fullname, setFullname] = useState("");
@@ -127,6 +128,15 @@ export default function ContactForm() {
                     {loading ? "Sending..." : "Send"}
                 </button>
             </form>
+            <div className="flex justify-center mt-6">
+                <Link href="/api/Frontend/home" passHref>
+                    <button
+                        className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300"
+                    >
+                        Go Home
+                    </button>
+                </Link>
+            </div>
         </>
     );
 }
